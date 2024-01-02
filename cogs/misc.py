@@ -61,6 +61,31 @@ class Misc(commands.Cog):
         await webhook.send(message, username=member.display_name, avatar_url=member.avatar.url)
         await webhook.delete()
         
+    @commands.is_owner()
+    @commands.command(name="status", description="Change my status")
+    async def change_status(self, ctx: commands.Context, status: str, *, message: str = None) -> None:
+        """
+        :param status: Status to change to
+        :type status: str
+        """
+
+        if status == "online":
+            status = discord.Status.online
+        elif status == "idle":
+            status = discord.Status.idle
+        elif status == "dnd":
+            status = discord.Status.dnd
+        elif status == "invisible":
+            status = discord.Status.invisible
+        else:
+            return await ctx.reply(f"Invalid status: **'{status}'**. Available statuses are online, idle, dnd and invisible")
+        
+        if message:
+            await self.client.change_presence(status=status, activity=discord.Game(name=message))
+            return await ctx.reply(f"Successfully changed status to **{status}** with message: **{message}**")
+        else:
+            await self.client.change_presence(status=status)
+            return await ctx.reply(f"Successfully changed status to {status}")   
     
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Misc(client))
